@@ -1,0 +1,23 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto11
+    commands:
+      - echo "Installing Maven..."
+      - yum install -y maven
+      - mvn --version  # Verify Maven installation
+  build:
+    commands:
+      - echo "Building..."
+      - echo "Running $CODEBUILD_BUILD_ID on $CODEBUILD_BUILD_URL"
+      - mvn clean install -f pom.xml
+  post_build:
+    commands:
+      - echo "Archiving artifacts..."
+      - aws s3 cp target/*.war s3://code-pipeline-aws-jenkins-project/  # Upload the WAR file to S3
+artifacts:
+  files:
+    - '**/*'
+
